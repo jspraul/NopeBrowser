@@ -1,30 +1,31 @@
 package net.spraul.nopebrowser
 
 import android.os.Bundle
-import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import net.spraul.nopebrowser.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Set up the WebView
-        webview.webViewClient = WebViewClient()
-        webview.settings.javaScriptEnabled = true
+        binding.webView.webViewClient = WebViewClient()
 
-        // Set up the button click listeners
-        button1.setOnClickListener { loadWebsite("https://www.google.com") }
-        button2.setOnClickListener { loadWebsite("https://www.youtube.com") }
-        button3.setOnClickListener { loadWebsite("https://www.reddit.com") }
-    }
+        binding.buttonGoogle.setOnClickListener {
+            binding.webView.loadUrl("https://www.google.com")
+        }
 
-    // Load the specified URL in the WebView
-    private fun loadWebsite(url: String) {
-        webview.loadUrl(url)
+        binding.buttonFacebook.setOnClickListener {
+            binding.webView.loadUrl("https://www.facebook.com")
+        }
+
+        binding.buttonTwitter.setOnClickListener {
+            binding.webView.loadUrl("https://www.twitter.com")
+        }
     }
 }
-
