@@ -4,35 +4,38 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <WebView
-        android:id="@+id/web_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/button_google"
+            android:id="@+id/button_good_and_beautiful"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Google" />
+            android:text="🎓"
+            style="?android:attr/buttonBarButtonStyle" />
 
         <Button
-            android:id="@+id/button_facebook"
+            android:id="@+id/button_abeka"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Facebook" />
+            android:text="️📺"
+            style="?android:attr/buttonBarButtonStyle" />
 
         <Button
-            android:id="@+id/button_twitter"
+            android:id="@+id/button_triumph_baptist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Twitter" />
+            android:text="⛪"
+            style="?android:attr/buttonBarButtonStyle" />
 
     </LinearLayout>
+
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 </LinearLayout>
