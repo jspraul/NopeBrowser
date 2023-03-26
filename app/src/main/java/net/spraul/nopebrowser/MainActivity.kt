@@ -1,9 +1,15 @@
 package net.spraul.nopebrowser
 
 import android.os.Bundle
+import android.util.Log
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
 import net.spraul.nopebrowser.databinding.ActivityMainBinding
+
+private const val TAG = "NopeBrowser"
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,7 +21,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.webView.settings.javaScriptEnabled = true
-        binding.webView.webViewClient = WebViewClient()
+        binding.webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ): Boolean {
+                val url = request.url.toString()
+                Log.i(TAG, "Allowing URL: $url")
+                return super.shouldOverrideUrlLoading(view, request)
+            }
+
+            override fun shouldInterceptRequest(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): WebResourceResponse? {
+                val url = request?.url.toString()
+                Log.i(TAG, "Not replacing URL content: $url")
+                return super.shouldInterceptRequest(view, request)
+            }
+        }
 
         binding.buttonGoodAndBeautiful.setOnClickListener {
             binding.webView.loadUrl("https://goodandbeautiful.com")
