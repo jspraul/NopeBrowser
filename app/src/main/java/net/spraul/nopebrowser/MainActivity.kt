@@ -14,18 +14,26 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.webView.settings.javaScriptEnabled = true
         binding.webView.webViewClient = WebViewClient()
 
-        binding.buttonGoogle.setOnClickListener {
-            binding.webView.loadUrl("https://www.google.com")
+        binding.buttonGoodAndBeautiful.setOnClickListener {
+            binding.webView.loadUrl("https://goodandbeautiful.com")
         }
+        binding.buttonAbeka.setOnClickListener {
+            binding.webView.loadUrl("https://athome.abeka.com/Video2/Streaming/Default.aspx")
+        }
+        binding.buttonTriumphBaptist.setOnClickListener {
+            binding.webView.loadUrl("https://triumphbaptist.org")
+        }
+    }
 
-        binding.buttonFacebook.setOnClickListener {
-            binding.webView.loadUrl("https://www.facebook.com")
-        }
-
-        binding.buttonTwitter.setOnClickListener {
-            binding.webView.loadUrl("https://www.twitter.com")
-        }
+    // TODO: https://stackoverflow.com/questions/72634225/onbackpressed-deprecated-what-is-the-alternative
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (binding.webView.canGoBack())
+            binding.webView.goBack()
+        else
+            super.onBackPressed()
     }
 }
