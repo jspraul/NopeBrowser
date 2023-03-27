@@ -24,3 +24,15 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+
+    - uses: "marvinpinto/action-automatic-releases@latest"
+    - name: Development Build
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: true
+        title: "Development Build"
+          files: |
+            LICENSE.txt
+            *.apk
+
