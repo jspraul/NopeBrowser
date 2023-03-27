@@ -40,17 +40,21 @@ class MainActivity : AppCompatActivity() {
         binding.webView.settings.javaScriptEnabled = true
         binding.webView.settings.domStorageEnabled = true
 
-        binding.webView.webViewClient = object : WebViewClient() {
+        val filter = object : WebViewClient() {
+            var denyHostCount = HashMap<String, Int>()
+            var allowHostCount = HashMap<String, Int>()
+
             override fun shouldOverrideUrlLoading(
                 view: WebView,
                 request: WebResourceRequest
             ): Boolean {
+                val host = request.url?.host ?: ""
                 val url = request.url.toString()
                 return if (allowUrl(url)) {
-                    Log.i(TAG, "Allowing URL: $url")
+                    Log.i(TAG, "YUP URL $host $url")
                     super.shouldOverrideUrlLoading(view, request)
                 } else {
-                    Log.i(TAG, "Blocking URL: $url")
+                    Log.i(TAG, "NOPE URL $host $url")
                     true
                 }
             }
@@ -59,16 +63,49 @@ class MainActivity : AppCompatActivity() {
                 view: WebView?,
                 request: WebResourceRequest?
             ): WebResourceResponse? {
+                val host = request?.url?.host ?: ""
                 val url = request?.url.toString()
                 return if (allowUrl(url)) {
-                    Log.i(TAG, "Allowed content: $url")
+                    if (allowHostCount.containsKey(host)) {
+                        allowHostCount[host] = allowHostCount.getValue(host) + 1
+                    }
+                    else {
+                        allowHostCount[host] = 1
+                    }
+                    Log.i(TAG, "YUP REQ $host $url")
                     super.shouldInterceptRequest(view, request)
                 } else {
-                    Log.i(TAG, "Blocking content: $url")
+                    if (denyHostCount.containsKey(host)) {
+                        denyHostCount[host] = denyHostCount.getValue(host) + 1
+                    }
+                    else {
+                        denyHostCount[host] = 1
+                    }
+                    Log.i(TAG, "NOPE REQ $host $url")
                     WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(ByteArray(0)))
                 }
             }
+
+            fun logAndClearHostCount()
+            {
+                var sortedEntries = allowHostCount.entries.sortedByDescending { it.value }
+                var logMessage = StringBuilder("YUP REQ hosts\n")
+                for ((host, count) in sortedEntries) {
+                    logMessage.append("\t%4d $host\n".format(count))
+                }
+                Log.i(TAG, logMessage.toString())
+                allowHostCount.clear()
+
+                sortedEntries = denyHostCount.entries.sortedByDescending { it.value }
+                logMessage = StringBuilder("NOPE REQ hosts\n")
+                for ((host, count) in sortedEntries) {
+                    logMessage.append("\t%4d $host\n".format(count))
+                }
+                Log.i(TAG, logMessage.toString())
+                denyHostCount.clear()
+            }
         }
+        binding.webView.webViewClient = filter
 
         binding.buttonGoodAndBeautiful.setOnClickListener {
             binding.webView.loadUrl("https://goodandbeautiful.com")
@@ -78,6 +115,9 @@ class MainActivity : AppCompatActivity() {
         }
         binding.buttonTriumphBaptist.setOnClickListener {
             binding.webView.loadUrl("https://triumphbaptist.org")
+        }
+        binding.buttonDebug.setOnClickListener {
+            filter.logAndClearHostCount()
         }
     }
 
