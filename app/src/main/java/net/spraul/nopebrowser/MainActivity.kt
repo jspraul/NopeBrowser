@@ -15,16 +15,11 @@ private val denyUrlContains = arrayOf(
     "youtube.com/watch"
 )
 private val allowUrlContains = arrayOf(
-    "192.168.1.1",
-    "polyfill.io", "www.google-analytics.com", "www.google.com",
-    "abcmouse",
-    "abeka",
-      //"js.monitor.azure.com", "applicationinsights.azure.com",
-      //"static.hotjar.com", "script.hotjar.com",
-      //"apps.usw2.pure.cloud",
-    "babbel", "cloudfront",
-    "goodandbeautiful", "scratch", "vimeocdn", "player.vimeo.com",
-    "youtube", "googlevideo", "gstatic"
+    "www.google-analytics.com", "www.google.com",
+    ".abeka.com",
+    "goodandbeautiful.com",
+    ".vimeocdn.com", "player.vimeo.com",
+    "www.youtube.com", ".googlevideo.com", ".gstatic.com"
 )
 
 class MainActivity : AppCompatActivity() {
@@ -48,13 +43,12 @@ class MainActivity : AppCompatActivity() {
                 view: WebView,
                 request: WebResourceRequest
             ): Boolean {
-                val host = request.url?.host ?: ""
                 val url = request.url.toString()
                 return if (allowUrl(url)) {
-                    Log.i(TAG, "YUP URL $host $url")
+                    Log.i(TAG, "YUP URL $url")
                     super.shouldOverrideUrlLoading(view, request)
                 } else {
-                    Log.i(TAG, "NOPE URL $host $url")
+                    Log.i(TAG, "NOPE URL $url")
                     true
                 }
             }
@@ -72,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                     else {
                         allowHostCount[host] = 1
                     }
-                    Log.i(TAG, "YUP REQ $host $url")
+                    Log.i(TAG, "YUP REQ $url")
                     super.shouldInterceptRequest(view, request)
                 } else {
                     if (denyHostCount.containsKey(host)) {
@@ -81,11 +75,12 @@ class MainActivity : AppCompatActivity() {
                     else {
                         denyHostCount[host] = 1
                     }
-                    Log.i(TAG, "NOPE REQ $host $url")
+                    Log.i(TAG, "NOPE REQ $url")
                     WebResourceResponse("text/plain", "UTF-8", ByteArrayInputStream(ByteArray(0)))
                 }
             }
 
+            // TODO: call on cleanup (WebView.onDetachedFromWindow?)
             fun logAndClearHostCount()
             {
                 var sortedEntries = allowHostCount.entries.sortedByDescending { it.value }
@@ -107,14 +102,17 @@ class MainActivity : AppCompatActivity() {
         }
         binding.webView.webViewClient = filter
 
-        binding.buttonGoodAndBeautiful.setOnClickListener {
-            binding.webView.loadUrl("https://goodandbeautiful.com")
-        }
         binding.buttonAbeka.setOnClickListener {
             binding.webView.loadUrl("https://athome.abeka.com/Video2/Streaming/Default.aspx")
         }
-        binding.buttonTriumphBaptist.setOnClickListener {
-            binding.webView.loadUrl("https://triumphbaptist.org")
+        binding.buttonHistory.setOnClickListener {
+            binding.webView.loadUrl("https://goodandbeautiful.com/history3/")
+        }
+        binding.buttonMath.setOnClickListener {
+            binding.webView.loadUrl("https://goodandbeautiful.com/math4/")
+        }
+        binding.buttonScience.setOnClickListener {
+            binding.webView.loadUrl("https://goodandbeautiful.com/sciencevideos/")
         }
         binding.buttonDebug.setOnClickListener {
             filter.logAndClearHostCount()

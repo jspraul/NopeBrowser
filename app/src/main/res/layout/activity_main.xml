@@ -10,13 +10,6 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/button_good_and_beautiful"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🎓"
-            style="?android:attr/buttonBarButtonStyle" />
-
-        <Button
             android:id="@+id/button_abeka"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,10 +17,24 @@
             style="?android:attr/buttonBarButtonStyle" />
 
         <Button
-            android:id="@+id/button_triumph_baptist"
+            android:id="@+id/button_history"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="⛪"
+            android:text="📜"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <Button
+            android:id="@+id/button_math"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🧮"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <Button
+            android:id="@+id/button_science"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🧪"
             style="?android:attr/buttonBarButtonStyle" />
 
         <Button
