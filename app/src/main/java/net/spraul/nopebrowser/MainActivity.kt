@@ -18,7 +18,7 @@ private val allowUrlContains = arrayOf(
     "www.google-analytics.com", "www.google.com",
     ".abeka.com",
     "goodandbeautiful.com",
-    ".vimeocdn.com", "player.vimeo.com",
+    ".vimeocdn.com", "player.vimeo.com", "player-telemetry.vimeo.com", ".cloudfront.net", ".akamaized.net",
     "www.youtube.com", ".googlevideo.com", ".gstatic.com"
 )
 
