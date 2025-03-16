@@ -2,13 +2,21 @@ package net.spraul.nopebrowser
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.*
 import net.spraul.nopebrowser.databinding.ActivityMainBinding
 import java.io.ByteArrayInputStream
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.concurrent.fixedRateTimer
 
 private const val TAG = "NopeBrowser"
 private val denyUrlContains = arrayOf(
@@ -26,10 +34,49 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private val started: Long = System.nanoTime()
+    private var mostRecentRequest: Long = started
+
+    private val broadcastSocket = DatagramSocket().also{ it.broadcast = true }
+    private val broadcastIp = InetAddress.getByAddress(byteArrayOf(192.toByte(), 168.toByte(), 1, 255.toByte()))
+    private val heartbeatData = "NopeBrowser:${started}:FOREGROUND".toByteArray()
+    private val heartbeatPacket = DatagramPacket(heartbeatData, heartbeatData.size, broadcastIp, 2119)
+    private val reqData = "NopeBrowser:${started}:REQ".toByteArray()
+    private val reqPacket = DatagramPacket(reqData, reqData.size, broadcastIp, 2119)
+    private fun broadcast(packet: DatagramPacket, desc: String) {
+        try {
+            broadcastSocket.send(packet)
+            Log.e(TAG, "BROADCAST: $desc")
+        }
+        catch(exc: Exception){
+            Log.e(TAG, "UDP send failed ($desc)", exc)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val lifecycleObserver = object : DefaultLifecycleObserver {
+            var timer: Timer? = null
+            var isTimerRunning: Boolean = false
+            override fun onStart(owner: LifecycleOwner){
+                timer?.cancel()
+                timer = fixedRateTimer(period = 2500L) {
+                    val now = System.nanoTime()
+                    if (now - mostRecentRequest > 5L * 60L * 1_000_000_000L) {
+                        Log.e(TAG, "heartbeat stopped ${now}-${mostRecentRequest}=${now-mostRecentRequest}")
+                        onStop(owner);
+                    }
+                    broadcast(heartbeatPacket, "heartbeat")
+                }
+            }
+            override fun onStop(owner: LifecycleOwner) {
+                timer?.cancel()
+            }
+        }
+        ProcessLifecycleOwner.get().lifecycle.addObserver(lifecycleObserver)
 
         binding.webView.settings.allowFileAccess = false
         binding.webView.settings.javaScriptEnabled = true
@@ -66,6 +113,10 @@ class MainActivity : AppCompatActivity() {
                     else {
                         allowHostCount[host] = 1
                     }
+                    if (System.nanoTime() - mostRecentRequest > 1_000_000_000L) {
+                        broadcast(reqPacket, "REQ")
+                    }
+                    mostRecentRequest = System.nanoTime()
                     Log.i(TAG, "YUP REQ $url")
                     super.shouldInterceptRequest(view, request)
                 } else {
@@ -117,6 +168,43 @@ class MainActivity : AppCompatActivity() {
         binding.buttonDebug.setOnClickListener {
             filter.logAndClearHostCount()
         }
+
+        binding.viewFinder.visibility = View.GONE;
+        /*
+        fun startCamera(){
+            val camera = ProcessCameraProvider.getInstance(this);
+            camera.addListener( {
+                val cameraProvider = camera.get();
+                try {
+                    cameraProvider.unbindAll();
+                    cameraProvider.bindToLifecycle(this, CameraSelector.DEFAULT_FRONT_CAMERA,
+                        Preview.Builder().build().also {
+                            it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+                        })
+                }
+                catch(exc: Exception){
+                    Log.e(TAG, "Camera binding failed", exc)
+                }
+            }, ContextCompat.getMainExecutor(this))
+        }
+
+        if (ContextCompat.checkSelfPermission(baseContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            val requestPermissionActivityLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                permissions.entries.forEach {
+                    if (it.key == Manifest.permission.CAMERA && !it.value) {
+                        Toast.makeText(baseContext, "Camera permission denied", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        startCamera();
+                    }
+                }
+            }
+            requestPermissionActivityLauncher.launch(arrayOf(Manifest.permission.CAMERA))
+        }
+        else {
+            startCamera();
+        }
+        */
     }
 
     // TODO: https://stackoverflow.com/questions/72634225/onbackpressed-deprecated-what-is-the-alternative

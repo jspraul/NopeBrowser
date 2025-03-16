@@ -30,3 +30,6 @@ TODO
   - E/BufferQueueProducer: \[ImageReader-1x1f23u2304m3-3043-0](id:be300000001,api:3,p:3043,c:3043) detachBuffer: slot 0 is not owned by the producer (state = FREE)
   - E/BufferQueueProducer: \[MediaCodec.release](id:be300000002,api:0,p:-1,c:3043) detachBuffer: BufferQueue has no connected producer
   - I/SurfaceComposerClient: popReleaseBufferCallbackLocked: callback not found for bufferId:### framenumber:###
+- inject JavaScript+UI to speed up video playback
+  - https://stackoverflow.com/questions/30036907/inject-javascript-file-to-my-site-with-webview-in-android
+  - camera face detection: require facing screen for high speed
